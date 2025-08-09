@@ -1,0 +1,43 @@
+sources:
+  # ----- Research & Verified (35%) -----
+  - name: MIT Technology Review - AI
+    url: https://www.technologyreview.com/feed/section/artificial-intelligence/
+    type: research
+
+  - name: Nature - Robotics & AI
+    url: https://www.nature.com/subjects/robotics/rss.xml
+    type: research
+
+  - name: IEEE Spectrum - Robotics
+    url: https://spectrum.ieee.org/feeds/topic/robotics/full
+    type: research
+
+  # ----- Industry Launches & Funding (40%) -----
+  - name: The Robot Report
+    url: https://www.therobotreport.com/feed/
+    type: industry
+
+  - name: TechCrunch - AI
+    url: https://techcrunch.com/category/artificial-intelligence/feed/
+    type: industry
+
+  - name: Robotics Business Review
+    url: https://www.roboticsbusinessreview.com/feed/
+    type: industry
+
+  - name: New Scientist - Technology
+    url: https://www.newscientist.com/subject/technology/feed/
+    type: industry
+
+  # ----- Fun / Weird / Dramatic (25%) -----
+  - name: Futurism
+    url: https://futurism.com/rss
+    type: fun
+
+  - name: Singularity Hub
+    url: https://singularityhub.com/feed/
+    type: fun
+
+  - name: The Verge - AI
+    url: https://www.theverge.com/rss/group/artificial-intelligence/index.xml
+    type: fun
