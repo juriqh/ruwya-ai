@@ -16,4 +16,7 @@ jobs:
       - run: pip install -r requirements.txt
       - env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GEMINI_MODEL: gemini-1.5-flash
         run: python fetch_and_publish.py
+
