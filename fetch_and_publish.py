@@ -83,16 +83,23 @@ def enforce_buckets(items, ratios={"research":0.35,"industry":0.40,"fun":0.25}, 
         seen.add(key); out.append(it)
     return out[:total]
 
-def save_and_push(items):
+def save_and_push(items, top3_ids=None):
     today = datetime.now(timezone.utc).date().isoformat()
     day_file = OUT_DIR/f"{today}.json"
     latest_file = OUT_DIR/"latest.json"
     with open(day_file,"w",encoding="utf-8") as f: json.dump(items, f, ensure_ascii=False, indent=2)
     with open(latest_file,"w",encoding="utf-8") as f: json.dump(items, f, ensure_ascii=False, indent=2)
 
+    meta = {"top3": top3_ids or []}
+    meta_file = OUT_DIR/"meta.json"
+    with open(meta_file,"w",encoding="utf-8") as f: json.dump(meta, f, ensure_ascii=False, indent=2)
+
+
     api = HfApi(token=os.environ.get("HF_TOKEN"))
     api.upload_file(path_or_fileobj=str(day_file), path_in_repo=f"daily/{day_file.name}", repo_id=HF_REPO_ID, repo_type="dataset")
     api.upload_file(path_or_fileobj=str(latest_file), path_in_repo="latest.json", repo_id=HF_REPO_ID, repo_type="dataset")
+    api.upload_file(path_or_fileobj=str(meta_file), path_in_repo="meta.json", repo_id=HF_REPO_ID, repo_type="dataset")
+
 
 def main():
     sources = load_sources()
@@ -104,7 +111,22 @@ def main():
             print("ERR source", src["name"], ex)
     all_items.sort(key=lambda x: x["published_at"], reverse=True)
     picked = enforce_buckets(all_items, total=12)
-    save_and_push(picked)
+
+    # Enrich with Gemini fields
+    enriched = []
+    for it in picked:
+        llm = summarize_one(it)
+        it["summary"] = llm.get("summary","") or it.get("excerpt","")
+        it["why"] = llm.get("why","")
+        it["impact_score"] = llm.get("impact_score",5)
+        it["tweet"] = llm.get("tweet","")
+        it["title_llm"] = llm.get("title_llm", it.get("title",""))
+        enriched.append(it)
+
+    # Compute Top 3 ids
+    top3_ids = pick_top3(enriched)
+
+    save_and_push(enriched, top3_ids=top3_ids)
     print(f"Published {len(picked)} items.")
 
 if __name__ == "__main__":
